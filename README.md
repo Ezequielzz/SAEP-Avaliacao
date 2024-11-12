@@ -37,3 +37,29 @@ CREATE TABLE Tarefa (
 <div align="center">
     <img src="/img/diagrama caso de uso.png">
 </div>
+
+## Telas
+
+### Home
+
+<div align="center">
+    <img src="/img/home.png">
+</div>
+
+### Cadastro Usuário
+
+<div align="center">
+    <img src="/img/cadastro usuario.png">
+</div>
+
+### Cadastro Tarefa
+
+<div align="center">
+    <img src="/img/cadastro tarefa.png">
+</div>
+
+### Gerenciamento Tarefa
+
+<div align="center">
+    <img src="/img/gerenciamento tarefa.png">
+</div>
