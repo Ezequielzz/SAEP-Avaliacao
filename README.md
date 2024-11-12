@@ -29,11 +29,11 @@ CREATE TABLE Tarefa (
 ### Diagrama Entidade Relacionamento
 
 <div align="center">
-    <img src="./img/diagrama classe.png">
+    <img src="/img/diagrama classe.png">
 </div>
 
 ### Diagrama de Casos de Uso
 
 <div align="center">
-    <img src="./img/diagrama caso de uso.png">
-</div># SAEP-Avaliacao
+    <img src="/img/diagrama caso de uso.png">
+</div>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Tarefas</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .task-column {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            min-height: 400px;
+        }
+
+        .task-card {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Gerenciamento de Tarefas</h1>
+
+        <div class="row">
+            <!-- Coluna "A Fazer" -->
+            <div class="col-md-4">
+                <h3>A Fazer</h3>
+                <div id="aFazerColumn" class="task-column"></div>
+            </div>
+
+            <!-- Coluna "Fazendo" -->
+            <div class="col-md-4">
+                <h3>Fazendo</h3>
+                <div id="fazendoColumn" class="task-column"></div>
+            </div>
+
+            <!-- Coluna "Pronto" -->
+            <div class="col-md-4">
+                <h3>Pronto</h3>
+                <div id="prontoColumn" class="task-column"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000';
+
+        // Função para listar tarefas e organizá-las por status
+        async function listarTarefas() {
+            const response = await fetch(`${BASE_URL}/api/tarefas`);
+            const tarefas = await response.json();
+
+            // Limpar colunas antes de adicionar tarefas
+            document.getElementById('aFazerColumn').innerHTML = '';
+            document.getElementById('fazendoColumn').innerHTML = '';
+            document.getElementById('prontoColumn').innerHTML = '';
+
+            tarefas.forEach(tarefa => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card bg-light';
+
+                taskCard.innerHTML = `
+                    <h5>${tarefa.descricao_tarefa}</h5>
+                    <p><strong>Setor:</strong> ${tarefa.nome_setor}</p>
+                    <p><strong>Prioridade:</strong> ${tarefa.prioridade_tarefa}</p>
+                    <p><strong>Usuário:</strong> ${tarefa.id_usuario}</p>
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <div>
+                            <input type="radio" name="status-${tarefa.id_tarefa}" value="a fazer" ${tarefa.status_tarefa === 'a fazer' ? 'checked' : ''}> A Fazer
+                            <input type="radio" name="status-${tarefa.id_tarefa}" value="fazendo" ${tarefa.status_tarefa === 'fazendo' ? 'checked' : ''}> Fazendo
+                            <input type="radio" name="status-${tarefa.id_tarefa}" value="pronto" ${tarefa.status_tarefa === 'pronto' ? 'checked' : ''}> Pronto
+                        </div>
+                    </div>
+                    <button onclick="editarTarefa(${tarefa.id_tarefa})" class="btn btn-warning btn-sm">Editar</button>
+                    <button onclick="excluirTarefa(${tarefa.id_tarefa})" class="btn btn-danger btn-sm">Excluir</button>
+                    <button onclick="alterarStatus(${tarefa.id_tarefa})" class="btn btn-primary btn-sm mt-2">Alterar Status</button>
+                `;
+
+                // Adicionar card na coluna correspondente ao status
+                if (tarefa.status_tarefa === 'a fazer') {
+                    document.getElementById('aFazerColumn').appendChild(taskCard);
+                } else if (tarefa.status_tarefa === 'fazendo') {
+                    document.getElementById('fazendoColumn').appendChild(taskCard);
+                } else if (tarefa.status_tarefa === 'pronto') {
+                    document.getElementById('prontoColumn').appendChild(taskCard);
+                }
+            });
+        }
+
+        // Função para editar uma tarefa
+        async function editarTarefa(id) {
+            window.location.href = `editar_tarefa.html?id=${id}`;
+        }
+
+        // Função para excluir uma tarefa
+        async function excluirTarefa(id) {
+            const confirmar = confirm("Tem certeza de que deseja excluir esta tarefa?");
+            if (confirmar) {
+                await fetch(`${BASE_URL}/api/tarefas/${id}`, {
+                    method: 'DELETE'
+                });
+                listarTarefas();
+            }
+        }
+
+        async function alterarStatus(id) {
+            const statusSelecionado = document.querySelector(`input[name="status-${id}"]:checked`).value;
+
+            // Atualizando o status da tarefa no backend
+            await fetch(`${BASE_URL}/api/tarefas/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status_tarefa: statusSelecionado })
+            }); 
+
+            // Recarregando a lista de tarefas para refletir a mudança
+            listarTarefas();
+        }
+
+
+        document.addEventListener('DOMContentLoaded', listarTarefas);
+    </script>
+</body>
+
+</html>

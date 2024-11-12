@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Tarefa</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Criar Nova Tarefa</h1>
+
+        <!-- Formulário de criação de tarefa -->
+        <form id="taskForm" class="mb-4">
+            <div class="form-group">
+                <label for="descricao">Descrição da Tarefa</label>
+                <input type="text" class="form-control" id="descricao" required>
+            </div>
+            <div class="form-group">
+                <label for="usuario">Funcionário</label>
+                <select class="form-control" id="usuario">
+                    <option value="">Selecione um usuário</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="setor">Nome do Setor</label>
+                <input type="text" class="form-control" id="setor" required>
+            </div>
+            <div class="form-group">
+                <label for="prioridade">Prioridade</label>
+                <select class="form-control" id="prioridade">
+                    <option value="baixa">Baixa</option>
+                    <option value="média">Média</option>
+                    <option value="alta">Alta</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Criar Tarefa</button>
+        </form>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000';
+
+        // Função para buscar todos os usuários e popular o combobox
+        async function carregarUsuarios() {
+            try {
+                const response = await fetch(`${BASE_URL}/api/usuarios`);
+                const usuarios = await response.json();
+                const usuarioSelect = document.getElementById('usuario');
+
+                usuarios.forEach(usuario => {
+                    const option = document.createElement('option');
+                    option.value = usuario.id_usuario;
+                    option.textContent = usuario.nome_usuario;
+                    usuarioSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Erro na requisição:", error);
+            }
+        }
+
+        // Função para criar uma nova tarefa
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id_usuario = document.getElementById('usuario').value;
+            const descricao = document.getElementById('descricao').value;
+            const setor = document.getElementById('setor').value;
+            const prioridade = document.getElementById('prioridade').value;
+
+            await fetch(`${BASE_URL}/api/tarefas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_usuario,
+                    descricao_tarefa: descricao,
+                    nome_setor: setor,
+                    prioridade_tarefa: prioridade
+                })
+            });
+            document.getElementById('taskForm').reset();
+            alert("Tarefa criada com sucesso!");
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarUsuarios);
+    </script>
+</body>
+
+</html>
